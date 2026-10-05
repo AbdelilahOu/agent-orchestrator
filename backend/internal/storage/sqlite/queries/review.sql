@@ -33,8 +33,13 @@ FROM review WHERE session_id = ? ORDER BY updated_at DESC, created_at DESC, id D
 -- name: SetReviewInterfaceMode :execrows
 UPDATE review SET interface_mode = ?, reviewer_handle_id = CASE WHEN ? = 'chat' THEN '' ELSE reviewer_handle_id END,
     provider_conversation_id = CASE WHEN ? = 'tui' THEN '' ELSE provider_conversation_id END,
-    controller_generation = CASE WHEN ? = 'tui' THEN '' ELSE controller_generation END,
+    controller_generation = CASE WHEN ? = 'chat' THEN '' ELSE controller_generation END,
     controller_error = '', updated_at = ? WHERE id = ?;
+
+-- name: RestoreReviewLaunchState :execrows
+UPDATE review SET pr_url = ?, interface_mode = ?, reviewer_handle_id = ?, agent_session_id = ?,
+    reviewer_activity_state = ?, reviewer_launch_id = ?, provider_conversation_id = ?,
+    controller_generation = ?, controller_error = ?, updated_at = ? WHERE id = ?;
 
 -- name: ClaimReviewChatController :execrows
 UPDATE review SET provider_conversation_id = ?, controller_generation = ?, controller_error = '', updated_at = ?
@@ -160,4 +165,20 @@ WHERE pr.head_sha != ''
             newer.created_at > review_run.created_at
             OR (newer.created_at = review_run.created_at AND newer.id > review_run.id)
         )
+  );
+
+-- name: FailUnsubmittedReviewBatchForChatTurn :exec
+UPDATE review_run SET status = 'failed', body = 'reviewer Chat turn ended without submitting a result'
+WHERE status = 'running' AND verdict = '' AND batch_id != ''
+  AND EXISTS (
+    SELECT 1 FROM conversation_turns AS turn
+    JOIN conversation_messages AS message ON message.turn_id = turn.id AND message.conversation_id = turn.conversation_id
+    JOIN review ON review.id = turn.handled_by_review_id
+    WHERE turn.id = sqlc.arg(turn_id)
+      AND turn.state IN ('completed', 'recovered', 'failed', 'interrupted', 'cancelled')
+      AND turn.handled_by_review_id = review_run.review_id
+      AND turn.controller_generation != '' AND turn.controller_generation = review.controller_generation
+      AND review.interface_mode = 'chat'
+      AND message.role = 'user' AND message.origin = 'daemon'
+      AND message.client_message_id = 'review-batch:' || review_run.batch_id
   );
