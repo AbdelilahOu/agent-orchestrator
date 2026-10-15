@@ -3155,6 +3155,26 @@ func (m *Manager) ResumeAgentWithMode(ctx context.Context, id domain.SessionID) 
 		if mode != domain.SessionModeChat || m.chat == nil {
 			return RestoreResult{}, fmt.Errorf("resume agent %s: %w", id, ErrAgentNotExited)
 		}
+	} else if mode == domain.SessionModeTUI && m.launchedTUIAgentStillAlive(ctx, rec) {
+		// A durable exited state is a hook-derived claim. Resume tears down the
+		// runtime, so refuse when the exact agent AO launched for this generation
+		// is provably still running: replacing it would kill a live conversation
+		// and resume whatever native id the stray signal recorded (#6454).
+		//
+		// Reconcile the activity state from this live probe so the session no
+		// longer shows as exited and the refusal is not a dead end.
+		signal := ports.ActivitySignal{
+			Valid:            true,
+			State:            domain.ActivityIdle,
+			Event:            "liveness-probe",
+			LaunchID:         strings.TrimSpace(rec.Metadata.RuntimeLaunchID),
+			ExpectedRevision: &rec.Revision,
+			Timestamp:        m.clock(),
+		}
+		if err := m.lcm.ApplyActivitySignal(ctx, rec.ID, signal); err != nil {
+			m.logger.Warn("resume agent: reconcile live agent activity failed", "sessionID", rec.ID, "error", err)
+		}
+		return RestoreResult{}, fmt.Errorf("resume agent %s: %w", id, ErrAgentNotExited)
 	}
 	if rec.HibernatedAt != nil {
 		store, ok := m.store.(interface {
@@ -3186,6 +3206,31 @@ func (m *Manager) ResumeAgentWithMode(ctx context.Context, id domain.SessionID) 
 		}
 	}
 	return m.resumeAgentRecordWithPolicy(ctx, "resume agent", rec, false, false)
+}
+
+// launchedTUIAgentStillAlive reports whether the exact AO supervisor of the
+// session's current launch still owns a live agent child. Only a definitive
+// alive reading counts: probe errors, missing handles, and runtimes without the
+// strict capability keep the existing resume behavior.
+func (m *Manager) launchedTUIAgentStillAlive(ctx context.Context, rec domain.SessionRecord) bool {
+	handleID := strings.TrimSpace(rec.Metadata.RuntimeHandleID)
+	launchID := strings.TrimSpace(rec.Metadata.RuntimeLaunchID)
+	if handleID == "" || launchID == "" {
+		return false
+	}
+	inspector, ok := m.runtime.(ports.ExactSupervisedProcessInspector)
+	if !ok {
+		return false
+	}
+	alive, err := inspector.IsExactSupervisedProcessAlive(ctx, ports.RuntimeHandle{ID: handleID}, ports.SupervisedProcessRef{
+		SessionID: rec.ID,
+		LaunchID:  launchID,
+	})
+	if err != nil {
+		m.logger.Warn("resume agent: launched agent liveness probe failed", "sessionID", rec.ID, "launch", launchID, "error", err)
+		return false
+	}
+	return alive
 }
 
 func (m *Manager) resumeAgentRecordWithPolicy(
