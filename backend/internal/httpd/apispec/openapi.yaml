@@ -13090,6 +13090,8 @@ components:
           items:
             $ref: '#/components/schemas/ConversationContentSummaryResponse'
           type: array
+        continuation:
+          type: boolean
         createdAt:
           type: string
         editAvailable:
@@ -13322,6 +13324,8 @@ components:
           type:
           - "null"
           - string
+        continueTurnId:
+          type: string
         controller:
           enum:
           - connecting
@@ -13380,6 +13384,7 @@ components:
         usage:
           $ref: '#/components/schemas/ConversationUsagePayload'
       required:
+      - continueTurnId
       - conversationId
       - branchedFromEarlierMessage
       - sessionId
@@ -15965,6 +15970,8 @@ components:
           type: array
         clientMessageId:
           type: string
+        continuation:
+          type: boolean
         excerpts:
           items:
             $ref: '#/components/schemas/ConversationExcerptReferenceRequest'
