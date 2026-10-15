@@ -4195,6 +4195,10 @@ export interface components {
             active: boolean;
             enabled: boolean;
             hasBattery: boolean;
+            lidActive?: boolean;
+            lidClosed?: boolean;
+            lidReason?: string;
+            lidSupported?: boolean;
             supported: boolean;
         };
         ControllersKillSessionRequest: {
@@ -4305,6 +4309,7 @@ export interface components {
         };
         ControllersSetKeepAwakeRequest: {
             enabled: boolean;
+            lidClosed?: null | boolean;
         };
         ControllersSetSecurePairingRequest: {
             enabled: boolean;

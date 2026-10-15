@@ -12441,6 +12441,14 @@ components:
           type: boolean
         hasBattery:
           type: boolean
+        lidActive:
+          type: boolean
+        lidClosed:
+          type: boolean
+        lidReason:
+          type: string
+        lidSupported:
+          type: boolean
         supported:
           type: boolean
       required:
@@ -12784,6 +12792,10 @@ components:
       properties:
         enabled:
           type: boolean
+        lidClosed:
+          type:
+          - "null"
+          - boolean
       required:
       - enabled
       type: object
