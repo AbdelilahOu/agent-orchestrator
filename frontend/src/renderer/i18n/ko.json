@@ -1,4 +1,9 @@
 {
+	"session.generatingBranchName": "브랜치 이름 생성 중",
+	"session.preparingBranch": "브랜치 준비 중",
+	"session.initializingBranch": "브랜치 초기화 중",
+	"session.resolvingBranchName": "브랜치 이름 결정 중",
+	"session.namingBranch": "브랜치 이름 생성 중",
 	"settings.harness.health.detectedCredential": "감지된 인증 정보",
 	"settings.harness.health.keychain": "시스템 키체인",
 	"settings.harness.health.checkFailed": "검사를 완료하지 못했습니다. 다시 시도하거나 진단 정보를 복사하세요.",

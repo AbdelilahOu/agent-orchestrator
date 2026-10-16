@@ -1,4 +1,9 @@
 {
+	"session.generatingBranchName": "ブランチ名を生成中",
+	"session.preparingBranch": "ブランチを準備中",
+	"session.initializingBranch": "ブランチを初期化中",
+	"session.resolvingBranchName": "ブランチ名を決定中",
+	"session.namingBranch": "ブランチ名を生成中",
 	"settings.harness.health.detectedCredential": "検出された認証情報",
 	"settings.harness.health.keychain": "システムキーチェーン",
 	"settings.harness.health.checkFailed": "チェックを完了できませんでした。再試行するか、診断情報をコピーしてください。",

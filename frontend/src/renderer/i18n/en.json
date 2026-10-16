@@ -1,4 +1,9 @@
 {
+	"session.generatingBranchName": "Generating branch name",
+	"session.preparingBranch": "Preparing branch",
+	"session.initializingBranch": "Initializing branch",
+	"session.resolvingBranchName": "Resolving branch name",
+	"session.namingBranch": "Naming branch",
 	"settings.harness.health.detectedCredential": "Detected credential",
 	"settings.harness.health.keychain": "System keychain",
 	"settings.harness.health.checkFailed": "Could not complete the check. Try again or copy diagnostics.",

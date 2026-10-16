@@ -1,4 +1,9 @@
 {
+	"session.generatingBranchName": "Generando nombre de rama",
+	"session.preparingBranch": "Preparando rama",
+	"session.initializingBranch": "Inicializando rama",
+	"session.resolvingBranchName": "Resolviendo nombre de rama",
+	"session.namingBranch": "Asignando nombre a la rama",
 	"settings.harness.health.detectedCredential": "Credencial detectada",
 	"settings.harness.health.keychain": "Llavero del sistema",
 	"settings.harness.health.checkFailed": "No se pudo completar la comprobación. Inténtalo de nuevo o copia los diagnósticos.",
