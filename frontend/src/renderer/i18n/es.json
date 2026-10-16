@@ -218,6 +218,8 @@
 	"browser.find.placeholder": "Buscar en la página",
 	"browser.find.previous": "Coincidencia anterior",
 	"browser.annotate": "Anotar página",
+	"browser.annotateAgentTab": "Anotar funciona en tus pestañas, no en las del agente",
+	"browser.agentPageOnHost": "Esta página se ejecuta en el equipo remoto",
 	"browser.annotationActive": "Anotando",
 	"browser.annotationCount_one": "{{count}} anotación",
 	"browser.annotationCount_other": "{{count}} anotaciones",
